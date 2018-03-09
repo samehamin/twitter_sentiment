@@ -2,47 +2,36 @@ import sys
 import json
 
 
-def hw():
-    print 'Hello, world!'
+def get_scores(sentiment_file):
 
-def lines(fp):
-    print str(len(fp.readlines()))
+    # fill the sentiment dic
+    with open(sent_file) as f:
+        return {line.split('\t')[0]: int(line.split('\t')[1]) for line in f}
 
 
-# Get the sentiments
-def generateSentimentDic(f_sentiment):
+def tweet_score(tweet, scores):
 
-    scores = {} # initialize an empty dictionary
-    for line in f_sentiment:
-        term, score  = line.split("\t")  # The file is tab-delimited. "\t" means "tab character"
-        scores[term] = int(score)  # Convert the score to an integer.
+    # calc sentiment scores
+    return sum(scores.get(word, 0) for word in tweet.split())
 
-    # print scores.items() # Print every (term, score) pair in the dictionary
+
+def tweet_scores(tweet_file, scores):
+
+    # Calculate scores of all tweets
+    tweets = open(tweet_file)
+    tweets_all_scores = []
     
+    for tweet in tweets:
+        tweet = json.loads(tweet).get('text', '')
+        tweet_score(tweet, scores)
+        tweets_all_scores.append(tweet_score(tweet, scores))
 
-# Generate tweets sentiments
-def generate_tweets_sent(tweet_file, sent_scores):
-
-    for tweet in tweet_file:
-        sum = 0
-        
-        try:
-            tweet = json.loads('utf-8')
-            print tweet
-        except ValueError:
-            pass
-
-"""        if 'text' in tweet:
-            print tweet
-            text = tweet['text']
-"""
-
-def main():
-    sent_file = open(sys.argv[1])
-    tweet_file = open(sys.argv[2])
-    scores = generateSentimentDic(sent_file)
-    generate_tweets_sent(tweet_file, scores)
+    return tweets_all_scores
 
 
 if __name__ == '__main__':
-    main()
+    sent_file = sys.argv[1]
+    tweet_file = sys.argv[2]
+    scores = get_scores(sentiment_file=sent_file)
+    sys.stdout.writelines('{0}.0\n'.format(score)
+                          for score in tweet_scores(tweet_file=tweet_file, scores=scores))
