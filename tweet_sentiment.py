@@ -5,7 +5,7 @@ import json
 def get_scores(sentiment_file):
 
     # fill the sentiment dic
-    with open(sent_file) as f:
+    with open(sentiment_file) as f:
         return {line.split('\t')[0]: int(line.split('\t')[1]) for line in f}
 
 
